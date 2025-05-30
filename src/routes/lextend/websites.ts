@@ -1,258 +1,177 @@
-export type WebsiteItem = {
-  icon?: string
-  title: string
-  desc: string
-  href: string
-  sort: number
-  type: 'general' | 'frontend' | 'resource'
+import Database from 'better-sqlite3';
+
+const db = new Database('db/lextend.db');
+
+// 获取所有网站类型
+export function getWebsiteTypes(): Options {
+  const types = db.prepare(`
+    SELECT * FROM website_types
+    ORDER BY sort ASC
+  `).all() as WebsiteTypedb[];
+  
+  return types.map(type => ({
+    id: type.id,
+    text: type.name
+  }));
 }
 
-const websites: WebsiteItem[] = [
-  {
-    title: 'Github',
-    desc: 'Github',
-    href: 'https://github.com/dashboard',
-    sort: 1,
-    type: 'general'
-  },
-  {
-    title: 'Github Repos',
-    desc: 'Github仓库',
-    href: 'https://github.com/Naxisigut?tab=repositories',
-    sort: 2,
-    type: 'general'
-  },
-  {
-    title: 'ChatGPT',
-    desc: 'ChatGPT',
-    href: 'https://chatgpt.com/',
-    sort: 3,
-    type: 'general'
-  },
-  {
-    title: 'Cursor',
-    desc: 'Cursor',
-    href: 'https://www.cursor.com/settings',
-    sort: 4,
-    type: 'general'
-  },
-  {
-    title: 'Google Translate',
-    desc: '谷歌翻译',
-    href: 'https://translate.google.com/?hl=zh-cn&sl=auto&tl=zh-CN&op=translate',
-    sort: 5,
-    type: 'general'
-  },
-  {
-    title: 'Starlink',
-    desc: '翻墙',
-    href: 'https://star.369.cyou/',
-    sort: 6,
-    type: 'general'
-  },
-  {
-    title: 'Regexr',
-    desc: '正则表达式测试',
-    href: 'https://regexr.com/',
-    sort: 7,
-    type: 'general'
-  },
-  {
-    title: 'Excalidraw',
-    desc: '流程图',
-    href: 'https://excalidraw.com/',
-    sort: 8,
-    type: 'general'
-  },
-  {
-    title: 'Snippet Generator',
-    desc: 'vscode代码片段',
-    href: 'https://snippet-generator.app/?description=&tabtrigger=&snippet=&mode=vscode',
-    sort: 9,
-    type: 'general'
-  },
-  {
-    title: 'vscode 快捷键',
-    desc: 'vscode 快捷键',
-    href: 'https://www.dute.org/vscode-shortcut',
-    sort: 10,
-    type: 'general'
-  },
-  {
-    title: 'CSS Inspiration',
-    desc: '个人博客 chokcoco',
-    href: 'https://chokcoco.github.io/CSS-Inspiration/#/',
-    sort: 11,
-    type: 'general'
-  },
-  {
-    title: '字体编辑',
-    desc: 'iconfont字体编辑',
-    href: 'https://www.1json.com/front/fonteditor.html',
-    sort: 12,
-    type: 'general'
-  },
-  {
-    title: 'UnoCSS',
-    desc: 'css框架',
-    href: 'http://unocss.cn/config/',
-    sort: 13,
-    type: 'frontend'
-  },
-  {
-    title: 'UnoCSS Tutorial',
-    desc: 'UnoCSS入门',
-    href: 'https://tutorial.unocss.dev/1-basics/1-introduction/1-welcome/',
-    sort: 14,
-    type: 'frontend'
-  },
-  {
-    title: 'Shadcn Vue',
-    desc: '无头组件库',
-    href: 'https://www.shadcn-vue.com/docs/components/accordion.html',
-    sort: 15,
-    type: 'frontend'
-  },
-  {
-    title: 'TailWindCSS',
-    desc: 'css框架',
-    href: 'https://www.tailwindcss.cn/docs/installation',
-    sort: 16,
-    type: 'frontend'
-  },
-  {
-    title: 'Vue',
-    desc: 'Vue',
-    href: 'https://cn.vuejs.org/guide/introduction.html',
-    sort: 17,
-    type: 'frontend'
-  },
-  {
-    title: 'NPM',
-    desc: 'NPM',
-    href: 'https://www.npmjs.com/',
-    sort: 18,
-    type: 'frontend'
-  },
-  {
-    title: 'Lucide',
-    desc: '图标库',
-    href: 'https://lucide.dev/icons/',
-    sort: 19,
-    type: 'frontend'
-  },
-  {
-    title: 'Element',
-    desc: '组件库',
-    href: 'https://element.eleme.cn/#/zh-CN/component/installation',
-    sort: 20,
-    type: 'frontend'
-  },
-  {
-    title: 'Vaul',
-    desc: 'Drawer组件 仿ios',
-    href: 'https://vaul.emilkowal.ski/',
-    sort: 21,
-    type: 'frontend'
-  },
-  {
-    title: 'vue-sonner',
-    desc: 'sonner toast组件',
-    href: 'https://vue-sonner.vercel.app/',
-    sort: 22,
-    type: 'frontend'
-  },
-  {
-    title: 'VueUse',
-    desc: 'Vue3 hook',
-    href: 'https://vueuse.org/guide/',
-    sort: 23,
-    type: 'frontend'
-  },
-  {
-    title: 'sortablejs',
-    desc: '拖拽排序',
-    href: 'https://sortablejs.com/',
-    sort: 24,
-    type: 'frontend'
-  },
-  {
-    title: 'vue-treeselect',
-    desc: '树形下拉',
-    href: 'https://vue-treeselect.js.org/',
-    sort: 25,
-    type: 'frontend'
-  },
-  {
-    title: 'rollup.js',
-    desc: '构建 打包工具',
-    href: 'https://www.rollupjs.com/',
-    sort: 26,
-    type: 'frontend'
-  },
-  {
-    title: 'mescroll',
-    desc: '移动端滚动组件',
-    href: 'https://www.mescroll.com/api.html',
-    sort: 27,
-    type: 'frontend'
-  },
-  {
-    title: 'TS入门教程',
-    desc: '电子书',
-    href: 'https://ts.xcatliu.com/',
-    sort: 28,
-    type: 'frontend'
-  },
-  {
-    title: 'Next.js',
-    desc: 'React框架',
-    href: 'https://nextjs.org/docs',
-    sort: 29,
-    type: 'frontend'
-  },
-  {
-    title: 'Vitest',
-    desc: '测试框架 vue3',
-    href: 'https://cn.vitest.dev/guide/',
-    sort: 30,
-    type: 'frontend'
-  },
-  {
-    title: 'UniBest',
-    desc: 'Uniapp框架 vue3',
-    href: 'https://codercup.github.io/unibest-docs/base/1-introduction',
-    sort: 31,
-    type: 'frontend'
-  },
-  {
-    title: 'Ant Design Vue',
-    desc: 'Vue组件库',
-    href: 'https://2x.antdv.com/components/input-cn',
-    sort: 32,
-    type: 'frontend'
-  },
-  {
-    title: 'Flowbite Icon',
-    desc: '无头图标库',
-    href: 'https://flowbite.com/icons/',
-    sort: 33,
-    type: 'frontend'
-  },
-  {
-    title: '不太灵影视',
-    desc: '视频下载',
-    href: 'https://www.2bt0.com',
-    sort: 34,
-    type: 'resource'
-  },
-  {
-    title: 'CN影院',
-    desc: '在线VIP',
-    href: 'https://cnys.tv/',
-    sort: 35,
-    type: 'resource'
-  },
-]
+// 添加网站类型
+export function addWebsiteType(name: string, sort: number) {
+  return db.prepare(`
+    INSERT INTO website_types (name, sort)
+    VALUES (?, ?)
+  `).run(name, sort);
+}
 
-export default websites
+
+// 查询网站列表
+export function getWebsites(params: GetWebsitesParams): PageResult<WebsiteView> {
+  const { typeId, keyword, tagId } = params;
+  const isPaging = params.isPaging === false ? false : true;
+  const status = params.status === false ? false : true;
+  const pageNumber = params.pageNumber || 1;
+  const limit = params.pageSize || 10;
+  const offset = (pageNumber - 1) * limit;
+
+  // 构建基础查询条件
+  const conditions = [
+    'w.deleted_at IS NULL',
+    'w.status = ?',
+    typeId ? 'w.type_id = ?' : null,
+    tagId ? 'wtt.tag_id = ?' : null,
+    keyword ? '(w.title LIKE ? OR w.desc LIKE ?)' : null,
+  ].filter(Boolean).join(' AND ');
+
+  // 构建查询参数
+  const queryParams = [
+    ...[status ? 1 : 0],
+    ...(typeId ? [typeId] : []),
+    ...(tagId ? [tagId] : []),
+    ...(keyword ? [`%${keyword}%`, `%${keyword}%`] : [])
+  ];
+
+  // 计算总记录数
+  const total = db.prepare(`
+    SELECT COUNT(DISTINCT w.id) as total
+    FROM websites w
+    ${tagId ? 'JOIN website_tags wtt ON w.id = wtt.website_id' : 'LEFT JOIN website_tags wtt ON w.id = wtt.website_id'}
+    WHERE ${conditions}
+  `).get(queryParams) as { total: number };
+
+  // 查询数据
+  const sql = `
+    SELECT 
+      w.*,
+      wt.name as type_name,
+      GROUP_CONCAT(t.name) as tags
+    FROM websites w
+    JOIN website_types wt ON w.type_id = wt.id
+    ${tagId ? 'JOIN website_tags wtt ON w.id = wtt.website_id' : 'LEFT JOIN website_tags wtt ON w.id = wtt.website_id'}
+    LEFT JOIN tags t ON wtt.tag_id = t.id
+    WHERE ${conditions}
+    GROUP BY w.id
+    ORDER BY w.sort ASC
+    ${isPaging ? `LIMIT ? OFFSET ?` : ''}
+  `;
+
+  console.log('111',sql);
+
+  // 执行查询
+  const dbRes = db.prepare(sql).all(
+    ...queryParams,
+    ...(isPaging ? [limit, offset] : [])
+  ) as WebsiteEntity[];
+
+  console.log('222',dbRes);
+
+  // 转换数据格式
+  const results: WebsiteView[] = dbRes.map(website => ({
+    id: website.id,
+    icon: website.icon,
+    title: website.title,
+    desc: website.desc,
+    href: website.href,
+    sort: website.sort,
+    typeId: website.type_id,
+    typeName: website.type_name,
+    status: Boolean(website.status),
+    tags: website.tags ? website.tags.split(',') : []
+  }));
+
+  return {
+    isPaging,
+    pageNumber,
+    pageSize: limit,
+    total: total.total,
+    list: results
+  };
+}
+
+
+// 添加网站
+export function addWebsite(params: AddWebsiteParams) {
+  return db.transaction(() => {
+    // 1. 获取最大排序值（只考虑未删除的记录）
+    const maxSort = db.prepare(`
+      SELECT MAX(sort) as maxSort FROM websites
+      WHERE deleted_at IS NULL
+    `).get() as { maxSort: number | null };
+
+    // 2. 插入网站
+    const websiteResult = db.prepare(`
+      INSERT INTO websites (
+        icon, title, desc, href, sort, type_id, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      params.icon,
+      params.title,
+      params.desc || null,
+      params.href || null,
+      params.sort ?? (maxSort.maxSort ?? 0) + 1,  // 如果没有传入sort，则使用最大值+1
+      params.typeId,
+      1  // status默认为1
+    );
+
+    const websiteId = websiteResult.lastInsertRowid;
+
+    // 3. 处理标签
+    if (params.tags && params.tags.length > 0) {
+      // 3.1 确保所有标签都存在
+      const tagStmt = db.prepare(`
+        INSERT OR IGNORE INTO tags (name)
+        VALUES (?)
+      `);
+      
+      params.tags.forEach(tag => {
+        tagStmt.run(tag);
+      });
+
+      // 3.2 获取标签ID
+      const tagIds = db.prepare(`
+        SELECT id FROM tags 
+        WHERE name IN (${params.tags.map(() => '?').join(',')})
+      `).all(...params.tags) as Array<{id: number}>;
+
+      // 3.3 建立网站-标签关联
+      const websiteTagStmt = db.prepare(`
+        INSERT INTO website_tags (website_id, tag_id)
+        VALUES (?, ?)
+      `);
+      
+      tagIds.forEach(tag => {
+        websiteTagStmt.run(websiteId, tag.id);
+      });
+    }
+
+    return websiteId;
+  })();
+}
+
+// 更新网站状态
+export function updateWebsiteStatus(id: number, status: boolean) {
+  return db.prepare(`
+      UPDATE websites
+      SET status = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+  `).run(status ? 1 : 0, id);
+}
