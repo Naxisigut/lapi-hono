@@ -167,11 +167,92 @@ export function addWebsite(params: AddWebsiteParams) {
   })();
 }
 
+// 更新网站
+export function updateWebsite(params: UpdateWebsiteParams) {
+  return db.transaction(() => {
+    // 1. 动态拼接需要更新的字段
+    const fields: string[] = [];
+    const values: any[] = [];
+
+    if (params.icon) {
+      fields.push('icon = ?');
+      values.push(params.icon);
+    }
+    if (params.title) {
+      fields.push('title = ?');
+      values.push(params.title);
+    }
+    if (params.desc) {
+      fields.push('desc = ?');
+      values.push(params.desc);
+    }
+    if (params.href) {
+      fields.push('href = ?');
+      values.push(params.href);
+    }
+    if (typeof params.sort === 'number') {
+      fields.push('sort = ?');
+      values.push(params.sort);
+    }
+    if (params.typeId) {
+      fields.push('type_id = ?');
+      values.push(params.typeId);
+    }
+
+    if (fields.length > 0) {
+      fields.push('updated_at = CURRENT_TIMESTAMP');
+      db.prepare(`
+        UPDATE websites
+        SET ${fields.join(', ')}
+        WHERE id = ?
+      `).run(...values, params.id);
+    }
+
+    // 2. 处理标签
+    if (params.tags) {
+      // 2.1 删除原有标签关联
+      db.prepare(`DELETE FROM website_tags WHERE website_id = ?`).run(params.id);
+
+      if (params.tags.length > 0) {
+        // 2.2 确保所有标签都存在
+        const tagStmt = db.prepare(`INSERT OR IGNORE INTO tags (name) VALUES (?)`);
+        params.tags.forEach(tag => tagStmt.run(tag));
+
+        // 2.3 获取标签ID
+        const tagIds = db.prepare(`
+          SELECT id FROM tags WHERE name IN (${params.tags.map(() => '?').join(',')})
+        `).all(...params.tags) as Array<{id: number}>;
+
+        // 2.4 建立新关联
+        const websiteTagStmt = db.prepare(`
+          INSERT INTO website_tags (website_id, tag_id)
+          VALUES (?, ?)
+        `);
+        tagIds.forEach(tag => {
+          websiteTagStmt.run(params.id, tag.id);
+        });
+      }
+    }
+    return params.id;
+  })();
+}
+
 // 更新网站状态
 export function updateWebsiteStatus(id: number, status: boolean) {
-  return db.prepare(`
+  db.prepare(`
       UPDATE websites
       SET status = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
   `).run(status ? 1 : 0, id);
+  return id;
+}
+
+// 删除网站
+export function deleteWebsite(id: number) {
+  db.prepare(`
+    UPDATE websites
+    SET deleted_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).run(id);
+  return id;
 }

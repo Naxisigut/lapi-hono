@@ -23,3 +23,11 @@ interface LapiReturnT<T> {
   data: T;
   message: string;
 }
+
+interface LapiFailReturn {
+  success: false;
+  data: null;
+  message: string;
+}
+
+type IdType = number | bigint;

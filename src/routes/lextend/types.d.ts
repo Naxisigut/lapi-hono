@@ -66,3 +66,16 @@ interface AddWebsiteParams {
   typeId: number;
   tags?: string[];
 }
+interface UpdateWebsiteParams extends AddWebsiteParams {
+  id: number;
+  title?: string;
+  typeId?: number;
+}
+interface UpdateWebsiteStatusParams {
+  id: number;
+  status: boolean;
+}
+interface DeleteWebsiteParams {
+  id: number;
+}
+
