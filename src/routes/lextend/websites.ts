@@ -8,21 +8,78 @@ export function getWebsiteTypes(): Options {
     SELECT * FROM website_types
     ORDER BY sort ASC
   `).all() as WebsiteTypedb[];
-  
-  return types.map(type => ({
+
+  const result = types.map(type => ({
     id: type.id,
     text: type.name
   }));
+  
+  return result;
 }
 
 // 添加网站类型
-export function addWebsiteType(name: string, sort: number) {
-  return db.prepare(`
+export function addWebsiteType(name: string) {
+  const maxSort = db.prepare(`
+    SELECT MAX(sort) as maxSort FROM website_types
+  `).get() as { maxSort: number | null };
+  const finalSort = (maxSort.maxSort ?? 0) + 1
+  const result = db.prepare(`
     INSERT INTO website_types (name, sort)
     VALUES (?, ?)
-  `).run(name, sort);
+  `).run(name, finalSort);
+
+  return result.lastInsertRowid;
 }
 
+// 更新网站类型
+export function updateWebsiteType(params: UpdateWebsiteTypeParams) {
+  const { id, name, sort } = params;
+  const fields: string[] = [];
+  const values: any[] = [];
+
+  if (name) {
+    fields.push('name = ?');
+    values.push(name);
+  }
+  if (typeof sort === 'number') {
+    fields.push('sort = ?');
+    values.push(sort);
+  }
+  if (fields.length === 0) {
+    // 没有要更新的内容，直接返回
+    return 0;
+  }
+
+  db.prepare(`
+    UPDATE website_types
+    SET ${fields.join(', ')}
+    WHERE id = ?
+  `).run(...values, id);
+
+  return id;
+}
+
+// 删除网站类型
+export function deleteWebsiteType(id: IdType) {
+  db.prepare(`
+    DELETE FROM website_types WHERE id = ?
+  `).run(id);
+  return id;
+}
+
+// 获取所有网站标签
+export function getWebsiteTags(): Options {
+  const tags = db.prepare(`
+    SELECT * FROM tags
+  `).all() as WebsiteTagdb[];
+
+  const result = tags.map(tag => ({
+    id: tag.id,
+    text: tag.name
+  }));
+
+  return result;
+}
 
 // 查询网站列表
 export function getWebsites(params: GetWebsitesParams): PageResult<WebsiteView> {
@@ -106,7 +163,6 @@ export function getWebsites(params: GetWebsitesParams): PageResult<WebsiteView> 
     list: results
   };
 }
-
 
 // 添加网站
 export function addWebsite(params: AddWebsiteParams) {
@@ -248,7 +304,7 @@ export function updateWebsiteStatus(id: number, status: boolean) {
 }
 
 // 删除网站
-export function deleteWebsite(id: number) {
+export function deleteWebsite(id: IdType) {
   db.prepare(`
     UPDATE websites
     SET deleted_at = CURRENT_TIMESTAMP

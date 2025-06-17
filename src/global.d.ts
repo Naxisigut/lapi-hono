@@ -31,3 +31,6 @@ interface LapiFailReturn {
 }
 
 type IdType = number | bigint;
+interface IdParams {
+  id: IdType;
+}

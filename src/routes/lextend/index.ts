@@ -1,5 +1,16 @@
 import { Hono } from 'hono'
-import { getWebsiteTypes, getWebsites, addWebsite, updateWebsite, updateWebsiteStatus, deleteWebsite } from './websites.js'
+import { 
+  getWebsiteTypes, 
+  addWebsiteType,
+  updateWebsiteType,
+  deleteWebsiteType,
+  getWebsites, 
+  addWebsite, 
+  updateWebsite, 
+  updateWebsiteStatus, 
+  deleteWebsite,
+  getWebsiteTags
+} from './websites.js'
 
 const lextend = new Hono()
 
@@ -7,6 +18,7 @@ lextend.get('/', (c) => {
   return c.text('Welcome to Lextend!')
 })
 
+/* website */
 lextend.post('/GetWebsites', async (c) => {
   const rawParams = await c.req.json<GetWebsitesParams>()
   const params = {
@@ -68,12 +80,64 @@ lextend.post('/UpdateWebsiteStatus', async (c) => {
 })
 
 lextend.post('/DeleteWebsite', async (c) => {
-  const params = await c.req.json<DeleteWebsiteParams>()
+  const params = await c.req.json<IdParams>()
   const websiteId = deleteWebsite(params.id)
   return c.json<LapiReturnT<IdType>>({
     success: true,
     data: websiteId,
     message: '删除成功'
+  })
+})
+
+
+/* website_type */
+lextend.post('/GetWebsiteTypes', async (c) => {
+  const typeOpts = getWebsiteTypes()
+  return c.json<LapiReturnT<Options>>({
+    success: true,
+    data: typeOpts,
+    message: 'ok'
+  })
+})
+
+lextend.post('/AddWebsiteType', async (c) => {
+  const params = await c.req.json<AddWebsiteTypeParams>()
+  const websiteTypeId = addWebsiteType(params.name)
+  return c.json<LapiReturnT<IdType>>({
+    success: true,
+    data: websiteTypeId,
+    message: '添加成功'
+  })
+})
+
+lextend.post('/UpdateWebsiteType', async (c) => {
+  const params = await c.req.json<UpdateWebsiteTypeParams>()
+  const websiteTypeId = updateWebsiteType(params)
+  return c.json<LapiReturnT<IdType>>({
+    success: true,
+    data: websiteTypeId,
+    message: '修改成功'
+  })
+})
+
+lextend.post('/DeleteWebsiteType', async (c) => {
+  const params = await c.req.json<IdParams>()
+  const websiteTypeId = deleteWebsiteType(params.id)
+  return c.json<LapiReturnT<IdType>>({
+    success: true,
+    data: websiteTypeId,
+    message: '删除成功'
+  })
+})
+
+
+/* website_tag */
+lextend.post('/GetWebsiteTags', async (c) => {
+  const tagOpts = getWebsiteTags()
+  return c.json<LapiReturnT<Options>>({
+    success: true,
+    data: tagOpts,
+    message: 'ok'
   })
 })
 
